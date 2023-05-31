@@ -5,52 +5,52 @@ import Card from "./components/Card";
 
 function App() {
 
-    const [pokeData, setPokeData] = useState({})
+    const [pokeList, setPokeList] = useState({})
+    const [link, setLink] = useState('https://pokeapi.co/api/v2/pokemon')
+
+    function handleClick(link) {
+        setLink(link);
+    }
 
 
     useEffect(() => {
-        const fetchData = async () => {
+        async function getTwentyPokes() {
             try {
-                const response = await axios.get('https://pokeapi.co/api/v2/pokemon/jigglypuff')
-                console.log(response.data)
-                setPokeData(response.data)
+                const fetchDataTwentyPokes = await axios.get(link)
+                console.log(fetchDataTwentyPokes.data)
+                setPokeList(fetchDataTwentyPokes.data)
             } catch (e) {
                 console.error(e)
             }
-
         }
 
-        fetchData();
+        getTwentyPokes();
 
-    }, [])
+    }, [link])
 
 
     return (
-        <div>
-
-            {Object.keys(pokeData).length !== 0 ?
-                (<>
-                    <Card
-                    name={pokeData.name}
-                    pic_location = {pokeData.sprites.front_default}
-                    alt_location = {`picture of ${pokeData.name}`}
-                    abilities = {pokeData.abilities}
-                    weight = {pokeData.weight}
-                    num_moves = {pokeData.moves.length}
-                    />
-
-                    {/*<h1>{pokeData.name}</h1>*/}
-                    {/*<img src={pokeData.sprites.front_default} alt=""/>*/}
-                    {/*<ul> Abilities*/}
-                    {/*    {pokeData.abilities.map((ability, index)=> {*/}
-                    {/*        return <li key={index}>{ability.ability.name}</li>*/}
-                    {/*    })}*/}
-                    {/*</ul>*/}
-                    {/*<p>Weight: {pokeData.weight}</p>*/}
-                    {/*<p>Moves: {pokeData.moves.length}</p>*/}
-                </>):
-                (<p></p>)}
-
+        <div className="outer-container">
+            <div className="inner-container">
+                <h1>POKEMON</h1>
+                <div className="button-box">
+                    <button
+                        disabled={pokeList.previous === null}
+                        onClick={(() => {
+                            handleClick(pokeList.previous)
+                        })}>Prev
+                    </button>
+                    <button onClick={(() => {
+                        handleClick(pokeList.next)
+                    })}>Next
+                    </button>
+                </div>
+                {Object.keys(pokeList).length > 0 &&
+                    <div className="cards-frame">
+                        {pokeList.results.map((poke) => {
+                            return (<Card key={poke.name} pokeName={poke.name}/>)
+                        })}
+                    </div>}</div>
         </div>
     );
 }
